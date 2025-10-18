@@ -3,68 +3,915 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriGirl - Your PCOS Health Companion</title>
+    <title>NutriGirl AI - Personalized Health & Nutrition for Women</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --primary-color: #FF1493;
+            --secondary-color: #FFB6C1;
+            --accent-color: #FFD1DC;
+            --nav-bg: #FFB3DE;
+            --container-bg: #FFB6C1;
+            --background-white: #ffffff;
+            --text-black: #000000;
+            --text-dark-pink: #C2185B;
+            --text-light: #000000;
+            --text-gray: #C2185B;
+            --text-pink: #C2185B;
+            --gradient-primary: linear-gradient(135deg, #FF1493, #FFB6C1);
+            --gradient-soft: linear-gradient(135deg, #FFB6C1, #FFD1DC);
+            --shadow-soft: 0 4px 6px -1px rgba(255, 20, 147, 0.1), 0 2px 4px -1px rgba(255, 20, 147, 0.06);
+            --shadow-medium: 0 10px 15px -3px rgba(255, 20, 147, 0.1), 0 4px 6px -2px rgba(255, 20, 147, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: white;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-dark-pink);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-black);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            background: linear-gradient(135deg, #5B21B6, #7C3AED);
+        }
+
+        .hero {
+            margin-top: 100px;
+            padding: 5rem 5%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            min-height: 80vh;
+            background: white;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 800;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-dark-pink);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--accent-color);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--primary-color);
+        }
+
+        .stars {
+            color: var(--accent-color);
+            font-size: 1.3rem;
+        }
+
+        .hero-visual {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--background-white);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--secondary-color);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-black);
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-dark-pink);
+            line-height: 1.5;
+        }
+
+        .features-section {
+            padding: 6rem 5%;
+            background: var(--background-white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-black);
+            font-weight: 800;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-dark-pink);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-item {
+            background: var(--background-white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.05), rgba(255, 105, 180, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .feature-item:hover::before {
+            opacity: 1;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary-color);
+            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.2);
+        }
+
+        .feature-item-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            color: var(--text-black);
+            font-weight: 700;
+        }
+
+        .feature-item p {
+            color: var(--text-dark-pink);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonials {
+            padding: 6rem 5%;
+            background: var(--background-white);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: var(--background-white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-color);
+            box-shadow: 0 15px 30px rgba(255, 20, 147, 0.2);
+        }
+
+        .testimonial-stars {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            color: var(--text-dark-pink);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--text-black);
+        }
+
+        .cta-section {
+            padding: 6rem 5%;
+            background: var(--container-bg);
+            text-align: center;
+            border-radius: 24px;
+            margin: 2rem 5%;
+            border: 3px solid var(--primary-color);
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-black);
+            font-weight: 800;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-dark-pink);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-color);
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-medium);
+            background: #f8fafc;
+        }
+
+        footer {
+            padding: 3rem 5%;
+            background: var(--background-white);
+            text-align: center;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        footer p {
+            color: var(--text-dark-pink);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 968px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 3rem 5%;
+            background: var(--background-white);
+            margin: 3rem 5%;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 2px solid var(--primary-color);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-dark-pink);
+            margin-top: 0.5rem;
+        }
+
+        /* Exercise Analysis Styles */
+        .exercise-analysis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .camera-section {
+            background: var(--container-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #outputCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+
+        .camera-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-accent:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+
+        .btn-accent:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .analysis-section {
+            background: var(--container-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .exercise-selector h3 {
+            color: var(--text-black);
+            margin-bottom: 1rem;
+        }
+
+        .exercise-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .exercise-btn {
+            background: #ffffff;
+            border: 2px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .exercise-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .exercise-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .exercise-btn i {
+            font-size: 1.5rem;
+        }
+
+        .analysis-results h3 {
+            color: var(--text-black);
+            margin-bottom: 1rem;
+        }
+
+        .result-card {
+            background: #ffffff;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-black);
+            font-weight: 600;
+        }
+
+        .result-content {
+            color: var(--text-pink);
+        }
+
+        .pose-points {
+            background: #ffffff;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pose-points h4 {
+            color: var(--text-black);
+            margin-bottom: 1rem;
+        }
+
+        .pose-points ul {
+            color: var(--text-pink);
+            padding-left: 1.5rem;
+        }
+
+        .pose-points li {
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-control {
+            background: #ffffff;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .voice-control h4 {
+            color: var(--text-black);
+            margin-bottom: 1rem;
+        }
+
+        .voice-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 20, 147, 0.1);
+            border-radius: 10px;
+        }
+
+        .voice-indicator i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .voice-indicator span {
+            color: var(--text-pink);
+        }
+
+        .btn-voice {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-voice:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .exercise-tips {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            margin-top: 2rem;
+        }
+
+        .exercise-tips h3 {
+            color: var(--text-black);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tip-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.2);
+        }
+
+        .tip-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .tip-card h4 {
+            color: var(--text-black);
+            margin-bottom: 0.75rem;
+        }
+
+        .tip-card p {
+            color: var(--text-pink);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .exercise-analysis-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercise-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .camera-container {
+                height: 300px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Landing Page -->
     <div id="landing-page" class="page active">
         <nav class="navbar">
-            <div class="nav-brand">
-                <i class="fas fa-heart"></i>
-                <span>NutriGirl</span>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="nutriGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF1493;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Circle -->
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#nutriGradient)" stroke-width="3"/>
+                        
+                        <!-- Girl -->
+                        <circle cx="50" cy="35" r="12" fill="#FF1493"/>
+                        <path d="M 50 47 L 50 70 M 35 55 L 50 60 L 65 55 M 50 70 L 40 85 M 50 70 L 60 85" 
+                              stroke="#FF1493" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span>NutriGirl AI</span>
             </div>
             <div class="nav-links">
-                <a href="#about">About</a>
                 <a href="#features">Features</a>
-                <a href="#contact">Contact</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#demo" class="btn-primary">Try Demo</a>
             </div>
         </nav>
 
-        <div class="hero-section">
+        <section class="hero">
             <div class="hero-content">
-                <h1>Empowering Your PCOS Journey</h1>
-                <p>Track your health, manage your nutrition, and take control of your PCOS with personalized insights and AI-powered recommendations.</p>
-                <button class="cta-button" onclick="goToDashboard()">
-                    <i class="fas fa-arrow-right"></i>
-                    Start Your Journey
-                </button>
+                <h1 style="color: #ffffff;">Your Personal AI Health Assistant for Hormonal Wellness</h1>
+                <p>Transform your health journey with science-backed nutrition insights. NutriGirl AI analyzes your blood reports to create personalized diet plans, helping you manage PCOS, PCOD, and hormonal imbalances naturally.</p>
+                <a href="#demo" class="btn-primary" style="font-size: 1.1rem; padding: 1.2rem 3rem;">Get Started Free</a>
+                <div class="rating">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <div>
+                        <strong>4.9/5</strong> from 10,000+ women
+                        <br><span style="font-size: 0.9rem; color: var(--text-gray);">Trusted by healthcare professionals</span>
             </div>
-            <div class="hero-image">
-                <div class="floating-card">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Track Vitals</span>
                 </div>
-                <div class="floating-card">
-                    <i class="fas fa-utensils"></i>
-                    <span>Food Analysis</span>
                 </div>
-                <div class="floating-card">
-                    <i class="fas fa-file-medical"></i>
-                    <span>Blood Reports</span>
+            <div class="hero-visual">
+                <div class="feature-card floating" style="animation-delay: 0s;">
+                    <div class="feature-icon">🩺</div>
+                    <h3>Blood Report Analysis</h3>
+                    <p>AI-powered insights from your lab results in seconds</p>
                 </div>
+                <div class="feature-card floating" style="animation-delay: 0.5s;">
+                    <div class="feature-icon">🍎</div>
+                    <h3>Live Food Tracking</h3>
+                    <p>Real-time calorie, sugar & nutrient monitoring</p>
+            </div>
+                <div class="feature-card floating" style="animation-delay: 1s;">
+                    <div class="feature-icon">📊</div>
+                    <h3>Weekly Reports</h3>
+                    <p>Comprehensive health summaries for your doctor</p>
+        </div>
+                <div class="feature-card floating" style="animation-delay: 1.5s;">
+                    <div class="feature-icon">💬</div>
+                    <h3>24/7 Support</h3>
+                    <p>AI assistant calls & expert consultation</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">AI Support</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1M+</div>
+                <div class="stat-label">Meals Tracked</div>
             </div>
         </div>
 
-        <div class="features-preview">
-            <div class="feature-card">
-                <i class="fas fa-heartbeat"></i>
-                <h3>Health Tracking</h3>
-                <p>Monitor your vital signs and hormone levels with detailed analytics</p>
+        <section class="features-section" id="features">
+            <div class="section-header">
+                <h2>Everything You Need for Hormonal Health</h2>
+                <p>Comprehensive tools designed specifically for women's health challenges</p>
             </div>
-            <div class="feature-card">
-                <i class="fas fa-camera"></i>
-                <h3>Food Analysis</h3>
-                <p>Snap a photo of your meal and get instant nutritional insights</p>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-item-icon">🔬</div>
+                    <h3>Smart Blood Report Analysis</h3>
+                    <p>Upload your lab reports and get instant AI-powered analysis of hormones, nutrients, and health markers. Understand what your numbers mean for PCOS/PCOD management.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">🥗</div>
+                    <h3>Personalized Diet Plans</h3>
+                    <p>Custom meal plans tailored to your hormonal profile, nutritional needs, and health goals. Science-backed recommendations that actually work.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">📱</div>
+                    <h3>Live Food Calorie Tracker</h3>
+                    <p>Track calories, sugar, and nutrients in real-time. Scan barcodes, search foods, or log recipes. Store your favorite meals for quick access.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">🤖</div>
+                    <h3>Weekly AI Assistant Calls</h3>
+                    <p>Receive automated weekly check-in calls from our AI assistant to track progress, answer questions, and adjust your plan as needed.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">📋</div>
+                    <h3>Doctor-Ready PDF Reports</h3>
+                    <p>Get comprehensive weekly and monthly health summaries formatted for easy sharing with your healthcare provider.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">☎️</div>
+                    <h3>24/7 Call Support</h3>
+                    <p>Access round-the-clock support from nutrition experts and health coaches. Get answers when you need them most.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">📈</div>
+                    <h3>Progress Monitoring</h3>
+                    <p>Visualize your health journey with detailed charts and trends. Track weight, symptoms, energy levels, and more.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">💊</div>
+                    <h3>Supplement Guidance</h3>
+                    <p>Get personalized supplement recommendations based on your nutrient deficiencies and health goals.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-item-icon">🔐</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your health data is encrypted and protected. HIPAA-compliant storage ensures complete privacy and security.</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <i class="fas fa-file-pdf"></i>
-                <h3>Report Analysis</h3>
-                <p>Upload blood reports for AI-powered nutrient and vital analysis</p>
+        </section>
+
+        <section class="testimonials" id="testimonials">
+            <div class="section-header">
+                <h2>Loved by Women Worldwide</h2>
+                <p>Real stories from real women who transformed their health</p>
             </div>
-        </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"NutriGirl AI helped me manage my PCOS symptoms naturally. The personalized diet plan and blood report analysis gave me insights my doctor missed. I've lost 15 pounds and my cycles are regular again!"</p>
+                    <p class="testimonial-author">- Sarah M., 28</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"The 24/7 support is a game-changer. I can call anytime with questions about my meals or symptoms. The weekly AI calls keep me accountable and motivated. Best health decision I've made!"</p>
+                    <p class="testimonial-author">- Priya K., 32</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"As someone with PCOD, tracking my nutrition was overwhelming until I found NutriGirl AI. The live food tracker is so easy to use, and the monthly reports help my doctor adjust my treatment plan."</p>
+                    <p class="testimonial-author">- Emma L., 26</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to Transform Your Health?</h2>
+            <p>Join thousands of women taking control of their hormonal health with AI-powered nutrition</p>
+            <a href="#demo" class="btn-secondary">Start Your Free Trial</a>
+            <p style="margin-top: 1.5rem; font-size: 0.95rem; opacity: 0.8;">No credit card required • Cancel anytime • 30-day money-back guarantee</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 NutriGirl AI. All rights reserved. | Privacy Policy | Terms of Service</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Made with 💖 for women's health worldwide</p>
+        </footer>
     </div>
 
     <!-- Dashboard -->
@@ -79,6 +926,10 @@
                     <i class="fas fa-home"></i>
                     Overview
                 </button>
+                <button class="nav-item" onclick="showSection('exercise-analysis')">
+                    <i class="fas fa-dumbbell"></i>
+                    Exercise Analysis
+                </button>
                 <button class="nav-item" onclick="showSection('blood-reports')">
                     <i class="fas fa-file-medical"></i>
                     Blood Reports
@@ -91,6 +942,10 @@
                     <i class="fas fa-chart-bar"></i>
                     Weekly Report
                 </button>
+                <button class="nav-item" onclick="showSection('chatbot')">
+                    <i class="fas fa-robot"></i>
+                    NutriBot
+                </button>
             </div>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
@@ -100,6 +955,39 @@
         <div class="dashboard-content">
             <!-- Overview Section -->
             <div id="overview" class="section active">
+                <!-- Warm Welcome Greeting -->
+                <div class="welcome-greeting">
+                    <div class="greeting-content">
+                        <div class="greeting-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="greeting-text">
+                            <h1 class="greeting-title" id="greeting-title">Welcome back, Beautiful! 💕</h1>
+                            <p class="greeting-description" id="greeting-description">Ready to continue your PCOS wellness journey? Let's check in on your health and make today amazing!</p>
+                            <div class="greeting-stats">
+                                <div class="greeting-stat">
+                                    <span class="stat-icon">📅</span>
+                                    <span class="stat-text" id="last-visit">Last visit: Today</span>
+                                </div>
+                                <div class="greeting-stat">
+                                    <span class="stat-icon">🎯</span>
+                                    <span class="stat-text" id="streak-days">7 day streak!</span>
+                                </div>
+                                <div class="greeting-stat">
+                                    <span class="stat-icon">💪</span>
+                                    <span class="stat-text" id="motivation">You're doing great!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="greeting-weather">
+                        <div class="weather-info">
+                            <i class="fas fa-sun" id="weather-icon"></i>
+                            <span id="weather-text">Perfect day for self-care!</span>
+                        </div>
+                    </div>
+                </div>
+
                 <h2>Your Health Overview</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -163,9 +1051,388 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Recent Micronutrient Levels -->
+                <div class="micronutrient-container">
+                    <h3><i class="fas fa-flask"></i> Recent Micronutrient Levels</h3>
+                    <p class="micronutrient-subtitle">Latest blood test results showing your vitamin and mineral levels</p>
+                    
+                    <div class="micronutrient-grid">
+                        <!-- Vitamins -->
+                        <div class="micronutrient-category">
+                            <h4><i class="fas fa-sun"></i> Vitamins</h4>
+                            <div class="micronutrient-list">
+                                <div class="micronutrient-item" data-level="normal">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Vitamin D</h5>
+                                        <p class="micronutrient-value">32 ng/mL</p>
+                                        <span class="micronutrient-status normal">Normal</span>
+                                    </div>
+                                    <div class="micronutrient-range">30-100 ng/mL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="low">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-leaf"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Folate (B9)</h5>
+                                        <p class="micronutrient-value">4.2 ng/mL</p>
+                                        <span class="micronutrient-status low">Low</span>
+                                    </div>
+                                    <div class="micronutrient-range">>5.4 ng/mL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="high">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Vitamin B12</h5>
+                                        <p class="micronutrient-value">850 pg/mL</p>
+                                        <span class="micronutrient-status high">High</span>
+                                    </div>
+                                    <div class="micronutrient-range">200-900 pg/mL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="normal">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Vitamin C</h5>
+                                        <p class="micronutrient-value">1.2 mg/dL</p>
+                                        <span class="micronutrient-status normal">Normal</span>
+                                    </div>
+                                    <div class="micronutrient-range">0.6-2.0 mg/dL</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Minerals -->
+                        <div class="micronutrient-category">
+                            <h4><i class="fas fa-mountain"></i> Minerals</h4>
+                            <div class="micronutrient-list">
+                                <div class="micronutrient-item" data-level="low">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-magnet"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Iron</h5>
+                                        <p class="micronutrient-value">45 μg/dL</p>
+                                        <span class="micronutrient-status low">Low</span>
+                                    </div>
+                                    <div class="micronutrient-range">65-175 μg/dL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="normal">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-bone"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Calcium</h5>
+                                        <p class="micronutrient-value">9.8 mg/dL</p>
+                                        <span class="micronutrient-status normal">Normal</span>
+                                    </div>
+                                    <div class="micronutrient-range">8.5-10.5 mg/dL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="low">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-atom"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Magnesium</h5>
+                                        <p class="micronutrient-value">1.6 mg/dL</p>
+                                        <span class="micronutrient-status low">Low</span>
+                                    </div>
+                                    <div class="micronutrient-range">1.8-2.6 mg/dL</div>
+                                </div>
+                                
+                                <div class="micronutrient-item" data-level="normal">
+                                    <div class="micronutrient-icon">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="micronutrient-info">
+                                        <h5>Zinc</h5>
+                                        <p class="micronutrient-value">85 μg/dL</p>
+                                        <span class="micronutrient-status normal">Normal</span>
+                                    </div>
+                                    <div class="micronutrient-range">70-120 μg/dL</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Micronutrient Summary -->
+                    <div class="micronutrient-summary">
+                        <h4><i class="fas fa-chart-pie"></i> Summary</h4>
+                        <div class="summary-stats">
+                            <div class="summary-item normal">
+                                <span class="summary-count">3</span>
+                                <span class="summary-label">Normal Levels</span>
+                            </div>
+                            <div class="summary-item low">
+                                <span class="summary-count">3</span>
+                                <span class="summary-label">Low Levels</span>
+                            </div>
+                            <div class="summary-item high">
+                                <span class="summary-count">1</span>
+                                <span class="summary-label">High Levels</span>
+                            </div>
+                        </div>
+                        <div class="micronutrient-recommendations">
+                            <h5><i class="fas fa-lightbulb"></i> Recommendations</h5>
+                            <ul>
+                                <li>Consider iron supplements for low iron levels</li>
+                                <li>Increase folate-rich foods (leafy greens, beans)</li>
+                                <li>Monitor B12 levels - consult your doctor</li>
+                                <li>Add magnesium-rich foods (nuts, seeds, dark chocolate)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise Suggestions Container -->
+                <div class="exercise-container">
+                    <h3><i class="fas fa-dumbbell"></i> Exercise & Yoga Suggestions</h3>
+                    <p class="exercise-subtitle">Light exercises and yoga poses perfect for women's health and PCOS management</p>
+                    
+                    <div class="exercise-categories">
+                        <!-- Light Exercises -->
+                        <div class="exercise-category">
+                            <h4><i class="fas fa-walking"></i> Light Exercises</h4>
+                            <div class="exercise-list">
+                                <div class="exercise-item" onclick="showExerciseDetails('walking')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-walking"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Brisk Walking</h5>
+                                        <p>30 minutes daily • Low impact</p>
+                                        <span class="exercise-benefit">Improves insulin sensitivity</span>
+                                    </div>
+                                    <div class="exercise-duration">30 min</div>
+                                </div>
+                                
+                                <div class="exercise-item" onclick="showExerciseDetails('cycling')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-bicycle"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Cycling</h5>
+                                        <p>20-30 minutes • Gentle cardio</p>
+                                        <span class="exercise-benefit">Reduces stress hormones</span>
+                                    </div>
+                                    <div class="exercise-duration">25 min</div>
+                                </div>
+                                
+                                <div class="exercise-item" onclick="showExerciseDetails('swimming')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-swimmer"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Swimming</h5>
+                                        <p>20-30 minutes • Full body workout</p>
+                                        <span class="exercise-benefit">Gentle on joints</span>
+                                    </div>
+                                    <div class="exercise-duration">25 min</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yoga Poses -->
+                        <div class="exercise-category">
+                            <h4><i class="fas fa-leaf"></i> Yoga for PCOS</h4>
+                            <div class="exercise-list">
+                                <div class="exercise-item" onclick="showExerciseDetails('child-pose')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-baby"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Child's Pose</h5>
+                                        <p>5-10 minutes • Relaxation</p>
+                                        <span class="exercise-benefit">Reduces stress & anxiety</span>
+                                    </div>
+                                    <div class="exercise-duration">8 min</div>
+                                </div>
+                                
+                                <div class="exercise-item" onclick="showExerciseDetails('cat-cow')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-cat"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Cat-Cow Stretch</h5>
+                                        <p>5-10 minutes • Spinal mobility</p>
+                                        <span class="exercise-benefit">Improves digestion</span>
+                                    </div>
+                                    <div class="exercise-duration">8 min</div>
+                                </div>
+                                
+                                <div class="exercise-item" onclick="showExerciseDetails('bridge-pose')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-archway"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Bridge Pose</h5>
+                                        <p>3-5 minutes • Hip opener</p>
+                                        <span class="exercise-benefit">Stimulates reproductive organs</span>
+                                    </div>
+                                    <div class="exercise-duration">5 min</div>
+                                </div>
+                                
+                                <div class="exercise-item" onclick="showExerciseDetails('legs-up-wall')">
+                                    <div class="exercise-icon">
+                                        <i class="fas fa-arrows-alt-v"></i>
+                                    </div>
+                                    <div class="exercise-info">
+                                        <h5>Legs Up the Wall</h5>
+                                        <p>5-15 minutes • Restorative</p>
+                                        <span class="exercise-benefit">Improves circulation</span>
+                                    </div>
+                                    <div class="exercise-duration">10 min</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exercise Tips -->
+                    <div class="exercise-tips">
+                        <h4><i class="fas fa-lightbulb"></i> Exercise Tips for PCOS</h4>
+                        <div class="tips-grid">
+                            <div class="tip-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Exercise in the morning for better hormone regulation</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Start with 10-15 minutes and gradually increase</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-balance-scale"></i>
+                                <span>Combine cardio with strength training</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-moon"></i>
+                                <span>Practice yoga before bed for better sleep</span>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Exercise Analysis Section -->
+        <div id="exercise-analysis" class="section">
+            <h2><i class="fas fa-dumbbell"></i> Exercise Form Analysis</h2>
+            <p class="section-subtitle">AI-powered exercise form analysis for perfect posture and safe workouts</p>
+            
+            <div class="exercise-analysis-container">
+                <div class="camera-section">
+                    <div class="camera-container">
+                        <video id="videoElement" autoplay muted playsinline></video>
+                        <canvas id="outputCanvas"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="startCamera" class="btn-primary">
+                            <i class="fas fa-video"></i>
+                            Start Camera
+                        </button>
+                        <button id="stopCamera" class="btn-secondary" disabled>
+                            <i class="fas fa-stop"></i>
+                            Stop Camera
+                        </button>
+                        <button id="captureFrame" class="btn-accent" disabled>
+                            <i class="fas fa-camera"></i>
+                            Analyze Position
+                        </button>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <div class="exercise-selector">
+                        <h3>Select Exercise Type</h3>
+                        <div class="exercise-buttons">
+                            <button class="exercise-btn active" data-exercise="squat">
+                                <i class="fas fa-running"></i>
+                                Squat
+                            </button>
+                            <button class="exercise-btn" data-exercise="plank">
+                                <i class="fas fa-stop"></i>
+                                Plank
+                            </button>
+                            <button class="exercise-btn" data-exercise="pushup">
+                                <i class="fas fa-hand-paper"></i>
+                                Push-up
+                            </button>
+                            <button class="exercise-btn" data-exercise="yoga">
+                                <i class="fas fa-leaf"></i>
+                                Yoga Pose
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="analysis-results">
+                        <h3>Analysis Results</h3>
+                        <div class="result-card" id="analysisResult">
+                            <div class="result-header">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Ready for Analysis</span>
+                            </div>
+                            <div class="result-content">
+                                <p>Start your camera and select an exercise to begin form analysis.</p>
+                            </div>
+                        </div>
+
+                        <div class="pose-points" id="posePoints">
+                            <h4>Key Points to Watch</h4>
+                            <ul id="keyPointsList">
+                                <li>Position yourself in the camera frame</li>
+                                <li>Ensure good lighting</li>
+                                <li>Wear form-fitting clothes for better detection</li>
+                            </ul>
+                        </div>
+
+                        <div class="voice-control">
+                            <h4>Voice Commands</h4>
+                            <div class="voice-indicator">
+                                <i class="fas fa-microphone" id="voiceIcon"></i>
+                                <span id="voiceStatus">Say "analyze" to start analysis</span>
+                            </div>
+                            <button id="startVoiceControl" class="btn-voice">
+                                <i class="fas fa-microphone"></i>
+                                Enable Voice Control
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Blood Reports Section -->
+            <div class="exercise-tips">
+                <h3><i class="fas fa-lightbulb"></i> Exercise Tips for Women</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <i class="fas fa-heart"></i>
+                        <h4>PCOS-Friendly</h4>
+                        <p>Focus on low-impact exercises that help with insulin resistance</p>
+                    </div>
+                    <div class="tip-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Safe Form</h4>
+                        <p>Proper form prevents injuries and maximizes benefits</p>
+                    </div>
+                    <div class="tip-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>Consistency</h4>
+                        <p>Regular exercise helps manage PCOS symptoms effectively</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Reports Section -->
             <div id="blood-reports" class="section">
                 <h2>Blood Report Analysis</h2>
                 <div class="upload-area" id="upload-area">
@@ -343,6 +1610,136 @@
                         <i class="fas fa-file-pdf"></i>
                         Generate Weekly Report
                     </button>
+                    <button class="voice-call-btn" onclick="makeVoiceCall()">
+                        <i class="fas fa-phone"></i>
+                        Call My Weekly Report
+                    </button>
+                </div>
+                
+                <!-- Call Assistance Section -->
+                <div class="call-assistance-section">
+                    <h3><i class="fas fa-phone-alt"></i> Get Your Weekly Report via Phone Call</h3>
+                    <p>Receive a personalized nutrition summary from Sarah, your NutriGirl PCOS nutrition companion</p>
+                    
+                    <div class="call-info">
+                        <div class="call-details">
+                            <div class="call-item">
+                                <i class="fas fa-user"></i>
+                                <span>Caller: Sarah from NutriGirl</span>
+                            </div>
+                            <div class="call-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Duration: 2-3 minutes</span>
+                            </div>
+                            <div class="call-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Focus: PCOS-friendly nutrition</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="call-actions">
+                        <button class="call-now-btn" onclick="makeVoiceCall()" id="call-now-btn">
+                            <i class="fas fa-phone"></i>
+                            <span>Call Now</span>
+                        </button>
+                        <button class="call-later-btn" onclick="scheduleCall()" id="call-later-btn">
+                            <i class="fas fa-calendar"></i>
+                            <span>Schedule Call</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Email Report Section -->
+                    <div class="email-report-section">
+                        <h4><i class="fas fa-envelope"></i> Email Your Weekly Report</h4>
+                        <p>Get your detailed nutrition report delivered to your email inbox</p>
+                        
+                        <div class="email-form">
+                            <div class="email-input-group">
+                                <input type="email" id="user-email" placeholder="Enter your email address" required>
+                                <button class="email-send-btn" onclick="sendEnhancedEmailReport()" id="email-send-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Send Report</span>
+                                </button>
+                            </div>
+                            <div class="email-status" id="email-status" style="display: none;">
+                                <div class="status-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="status-text">
+                                    <h5>Sending Report...</h5>
+                                    <p>Please wait while we prepare and send your detailed nutrition report</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="call-status" id="call-status" style="display: none;">
+                        <div class="status-content">
+                            <div class="status-icon">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <div class="status-text">
+                                <h4>Initiating Call...</h4>
+                                <p>Sarah from NutriGirl will call you shortly with your weekly nutrition report</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Voice Call Section -->
+                <div class="voice-call-section">
+                    <div class="call-header">
+                        <h3><i class="fas fa-phone-alt"></i> Get Your Weekly Report via Phone Call</h3>
+                        <p>Receive a personalized nutrition summary from Sarah, your NutriGirl PCOS nutrition companion</p>
+                    </div>
+                    
+                    <div class="call-info">
+                        <div class="call-details">
+                            <div class="call-item">
+                                <i class="fas fa-user"></i>
+                                <span>Caller: Sarah from NutriGirl</span>
+                            </div>
+                            <div class="call-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Duration: 2-3 minutes</span>
+                            </div>
+                            <div class="call-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Focus: PCOS-friendly nutrition</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="call-actions">
+                        <button class="call-now-btn" onclick="makeVoiceCall()" id="call-now-btn">
+                            <i class="fas fa-phone"></i>
+                            <span>Call Now</span>
+                        </button>
+                        <button class="call-later-btn" onclick="scheduleCall()" id="call-later-btn">
+                            <i class="fas fa-calendar"></i>
+                            <span>Schedule Call</span>
+                        </button>
+                    </div>
+                    
+                    <div class="call-status" id="call-status" style="display: none;">
+                        <div class="status-content">
+                            <div class="status-icon">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <div class="status-text">
+                                <h4>Initiating Call...</h4>
+                                <p>Sarah from NutriGirl will call you shortly with your weekly nutrition report</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="call-history" id="call-history" style="display: none;">
+                        <h4><i class="fas fa-history"></i> Recent Calls</h4>
+                        <div class="history-list" id="history-list">
+                            <!-- Call history will be populated here -->
+                        </div>
+                    </div>
                 </div>
                 <div id="weekly-stats" class="weekly-stats">
                     <div class="week-summary">
@@ -367,10 +1764,239 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Data Management Section -->
+                <div class="data-management-section">
+                    <h3>Data Management</h3>
+                    <p>Export your data or manage your stored information.</p>
+                    <div class="data-buttons">
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export Data
+                        </button>
+                        <button class="btn btn-info" onclick="viewDataSummary()">
+                            <i class="fas fa-chart-bar"></i>
+                            View Summary
+                        </button>
+                        <button class="btn btn-warning" onclick="clearAllData()">
+                            <i class="fas fa-trash"></i>
+                            Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbot Section -->
+            <div id="chatbot" class="section">
+                <h2>NutriBot - Your PCOS Nutrition Assistant</h2>
+                <p class="section-subtitle">Ask me anything about PCOS nutrition, meal planning, and healthy lifestyle tips!</p>
+                
+                <div class="chatbot-container">
+                    <div class="chatbot-header">
+                        <div class="bot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="bot-info">
+                            <h3>NutriBot</h3>
+                            <span class="bot-status" id="bot-status">Online</span>
+                        </div>
+                        <div class="chat-controls">
+                            <button class="clear-chat-btn" onclick="clearChat()" title="Clear Chat">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-text">
+                                    Hi! I'm NutriBot, your PCOS nutrition assistant. I'm here to help you with:
+                                    <ul>
+                                        <li>PCOS-friendly meal suggestions</li>
+                                        <li>Nutrition advice for hormone balance</li>
+                                        <li>Healthy lifestyle tips</li>
+                                        <li>Food recommendations</li>
+                                        <li>Answering your nutrition questions</li>
+                                    </ul>
+                                    How can I help you today?
+                                </div>
+                                <div class="message-time">Just now</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="quick-questions">
+                            <button class="quick-question-btn" onclick="askQuickQuestion('What foods should I avoid with PCOS?')">
+                                Foods to avoid
+                            </button>
+                            <button class="quick-question-btn" onclick="askQuickQuestion('Give me a PCOS-friendly breakfast idea')">
+                                Breakfast ideas
+                            </button>
+                            <button class="quick-question-btn" onclick="askQuickQuestion('How can I manage insulin resistance?')">
+                                Insulin resistance
+                            </button>
+                            <button class="quick-question-btn" onclick="askQuickQuestion('What supplements help with PCOS?')">
+                                Supplements
+                            </button>
+                        </div>
+                        
+                        <div class="chat-input-wrapper">
+                            <input type="text" id="chat-input" placeholder="Ask me anything about PCOS nutrition..." 
+                                   onkeypress="handleChatKeyPress(event)">
+                            <button class="send-btn" onclick="sendMessage()" id="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span>NutriBot is typing...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Floating Chatbot Button -->
+    <div class="floating-chatbot" id="floating-chatbot" onclick="toggleFloatingChat()">
+        <div class="chatbot-icon">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-badge" id="chatbot-badge" style="display: none;">1</div>
+    </div>
+
+    <!-- Floating Chat Window -->
+    <div class="floating-chat-window" id="floating-chat-window" style="display: none;">
+        <div class="floating-chat-header">
+            <div class="chat-title">
+                <i class="fas fa-robot"></i>
+                <span>NutriBot</span>
+            </div>
+            <div class="chat-controls">
+                <button class="minimize-chat" onclick="toggleFloatingChat()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="close-chat" onclick="closeFloatingChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="floating-chat-messages" id="floating-chat-messages">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-text">
+                        Hi! I'm NutriBot, your PCOS nutrition assistant. How can I help you today?
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+        <div class="floating-chat-input">
+            <input type="text" id="floating-chat-input" placeholder="Ask me anything..." onkeypress="handleFloatingChatKeyPress(event)">
+            <button class="floating-send-btn" onclick="sendFloatingMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script>
+        // Landing page functionality
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-item, .testimonial-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.getAttribute('href') === '#demo') {
+                    e.preventDefault();
+                    goToDashboard();
+                }
+            });
+        });
+
+        let scrollPos = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > scrollPos && currentScroll > 100) {
+                navbar.style.transform = 'translateY(-100%)';
+            } else {
+                navbar.style.transform = 'translateY(0)';
+            }
+            scrollPos = currentScroll;
+        });
+
+        const statNumbers = document.querySelectorAll('.stat-number');
+        const countUp = (el, target) => {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = el.textContent.replace(/[\d.]+/, target);
+                    clearInterval(timer);
+                } else {
+                    const value = Math.floor(current);
+                    el.textContent = el.textContent.replace(/[\d.]+/, value);
+                }
+            }, 20);
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const text = entry.target.textContent;
+                    const number = parseInt(text.replace(/\D/g, ''));
+                    countUp(entry.target, number);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        statNumbers.forEach(stat => statsObserver.observe(stat));
+    </script>
 </body>
 </html>
+

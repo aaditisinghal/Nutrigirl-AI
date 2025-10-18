@@ -1,32 +1,27 @@
 {
-  "name": "nutrigirl-pcos-app",
+  "name": "nutrigirl-app",
   "version": "1.0.0",
-  "description": "A comprehensive web application for PCOS/PCOD health management",
-  "main": "index.html",
+  "description": "PCOS Nutrition Companion App with Email Reports",
+  "main": "server.js",
   "scripts": {
-    "start": "python -m http.server 8000",
-    "dev": "python -m http.server 8000",
-    "build": "echo 'No build process needed - static files'",
-    "test": "echo 'No tests specified'"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   },
   "keywords": [
     "pcos",
-    "pcod",
-    "health",
     "nutrition",
-    "ai",
-    "openai",
-    "women-health"
+    "health",
+    "email",
+    "reports"
   ],
   "author": "NutriGirl Team",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {},
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "local"
-  }
+  "license": "MIT"
 }
