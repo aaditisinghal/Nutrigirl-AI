@@ -1,0 +1,32 @@
+{
+  "name": "nutrigirl-pcos-app",
+  "version": "1.0.0",
+  "description": "A comprehensive web application for PCOS/PCOD health management",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build process needed - static files'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "pcos",
+    "pcod",
+    "health",
+    "nutrition",
+    "ai",
+    "openai",
+    "women-health"
+  ],
+  "author": "NutriGirl Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "local"
+  }
+}

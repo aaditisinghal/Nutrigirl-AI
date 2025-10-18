@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriGirl - Your PCOS Health Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="page active">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-heart"></i>
+                <span>NutriGirl</span>
+            </div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>Empowering Your PCOS Journey</h1>
+                <p>Track your health, manage your nutrition, and take control of your PCOS with personalized insights and AI-powered recommendations.</p>
+                <button class="cta-button" onclick="goToDashboard()">
+                    <i class="fas fa-arrow-right"></i>
+                    Start Your Journey
+                </button>
+            </div>
+            <div class="hero-image">
+                <div class="floating-card">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Track Vitals</span>
+                </div>
+                <div class="floating-card">
+                    <i class="fas fa-utensils"></i>
+                    <span>Food Analysis</span>
+                </div>
+                <div class="floating-card">
+                    <i class="fas fa-file-medical"></i>
+                    <span>Blood Reports</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-preview">
+            <div class="feature-card">
+                <i class="fas fa-heartbeat"></i>
+                <h3>Health Tracking</h3>
+                <p>Monitor your vital signs and hormone levels with detailed analytics</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-camera"></i>
+                <h3>Food Analysis</h3>
+                <p>Snap a photo of your meal and get instant nutritional insights</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-file-pdf"></i>
+                <h3>Report Analysis</h3>
+                <p>Upload blood reports for AI-powered nutrient and vital analysis</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="page">
+        <nav class="dashboard-nav">
+            <div class="nav-brand">
+                <i class="fas fa-heart"></i>
+                <span>NutriGirl</span>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-item active" onclick="showSection('overview')">
+                    <i class="fas fa-home"></i>
+                    Overview
+                </button>
+                <button class="nav-item" onclick="showSection('blood-reports')">
+                    <i class="fas fa-file-medical"></i>
+                    Blood Reports
+                </button>
+                <button class="nav-item" onclick="showSection('food-tracker')">
+                    <i class="fas fa-utensils"></i>
+                    Food Tracker
+                </button>
+                <button class="nav-item" onclick="showSection('weekly-report')">
+                    <i class="fas fa-chart-bar"></i>
+                    Weekly Report
+                </button>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </nav>
+
+        <div class="dashboard-content">
+            <!-- Overview Section -->
+            <div id="overview" class="section active">
+                <h2>Your Health Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Heart Rate</h3>
+                            <p class="stat-value">72 bpm</p>
+                            <span class="stat-status good">Normal</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Weight</h3>
+                            <p class="stat-value">65.2 kg</p>
+                            <span class="stat-status good">Stable</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Blood Sugar</h3>
+                            <p class="stat-value">95 mg/dL</p>
+                            <span class="stat-status warning">Monitor</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Hormone Level</h3>
+                            <p class="stat-value">Balanced</p>
+                            <span class="stat-status good">Good</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-camera"></i>
+                            <div class="activity-content">
+                                <p>Food logged: Grilled Chicken Salad</p>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-file-upload"></i>
+                            <div class="activity-content">
+                                <p>Blood report uploaded and analyzed</p>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Reports Section -->
+            <div id="blood-reports" class="section">
+                <h2>Blood Report Analysis</h2>
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Your Blood Report</h3>
+                        <p>Drag and drop your PDF file here or click to browse</p>
+                        <input type="file" id="blood-report-input" accept=".pdf" style="display: none;">
+                        <button class="upload-btn" onclick="document.getElementById('blood-report-input').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+
+                <div id="analysis-results" class="analysis-results" style="display: none;">
+                    <h3>Analysis Results</h3>
+                    
+                    <!-- Key Findings Section -->
+                    <div class="findings-section">
+                        <h4><i class="fas fa-clipboard-list"></i> Key Findings</h4>
+                        <div id="key-findings" class="findings-content"></div>
+                    </div>
+
+                    <!-- Micronutrients Section -->
+                    <div class="micronutrients-section">
+                        <h4><i class="fas fa-pills"></i> Micronutrient Analysis</h4>
+                        <div class="micronutrients-grid" id="micronutrients-grid">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Meal Recommendations Section -->
+                    <div class="meal-recommendations">
+                        <h4><i class="fas fa-utensils"></i> Personalized Meal Plan</h4>
+                        
+                        <div class="meal-tabs">
+                            <button class="meal-tab active" onclick="showMealPlan('breakfast')">
+                                <i class="fas fa-sun"></i> Breakfast
+                            </button>
+                            <button class="meal-tab" onclick="showMealPlan('lunch')">
+                                <i class="fas fa-sun"></i> Lunch
+                            </button>
+                            <button class="meal-tab" onclick="showMealPlan('dinner')">
+                                <i class="fas fa-moon"></i> Dinner
+                            </button>
+                            <button class="meal-tab" onclick="showMealPlan('snacks')">
+                                <i class="fas fa-apple-alt"></i> Snacks
+                            </button>
+                        </div>
+
+                        <div class="meal-content">
+                            <div id="breakfast-plan" class="meal-plan active">
+                                <div class="meal-suggestions" id="breakfast-suggestions"></div>
+                            </div>
+                            <div id="lunch-plan" class="meal-plan">
+                                <div class="meal-suggestions" id="lunch-suggestions"></div>
+                            </div>
+                            <div id="dinner-plan" class="meal-plan">
+                                <div class="meal-suggestions" id="dinner-suggestions"></div>
+                            </div>
+                            <div id="snacks-plan" class="meal-plan">
+                                <div class="meal-suggestions" id="snacks-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food Suggestions Section -->
+                    <div class="food-suggestions-section">
+                        <h4><i class="fas fa-heart"></i> PCOS-Friendly Food Recommendations</h4>
+                        <div class="food-categories" id="food-categories">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food Tracker Section -->
+            <div id="food-tracker" class="section">
+                <h2>Smart Food Tracker</h2>
+                <p class="section-subtitle">Real-time AI analysis with live camera feed</p>
+                
+                <div class="split-screen-container">
+                    <!-- Left Side - Camera -->
+                    <div class="camera-side">
+                        <div class="camera-container">
+                            <div class="camera-preview">
+                                <video id="camera-video" autoplay playsinline muted></video>
+                                <div id="camera-placeholder" class="camera-placeholder" style="display: none;">
+                                    <i class="fas fa-camera"></i>
+                                    <p>Camera not available</p>
+                                    <button class="btn-compact primary" onclick="startCamera()">
+                                        <i class="fas fa-refresh"></i> Try Again
+                                    </button>
+                                </div>
+                                <div class="camera-overlay">
+                                    <div class="focus-frame"></div>
+                                    <div class="detection-info">
+                                        <span class="detection-text">Position food in frame</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                            <div class="camera-controls">
+                                <button id="start-camera" class="camera-btn primary">
+                                    <i class="fas fa-camera"></i>
+                                    Start Camera
+                                </button>
+                                <button id="capture-photo" class="camera-btn success" style="display: none;">
+                                    <i class="fas fa-camera"></i>
+                                    Analyze Food
+                                </button>
+                                <button id="stop-camera" class="camera-btn danger" style="display: none;">
+                                    <i class="fas fa-stop"></i>
+                                    Stop Camera
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Nutrition Facts -->
+                    <div class="nutrition-side">
+                        <div class="nutrition-panel">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-chart-pie"></i> Nutrition Analysis</h3>
+                                <div class="loading-indicator" id="loading-indicator" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                    <span>Analyzing...</span>
+                                </div>
+                            </div>
+                            
+                            <div id="nutrition-content" class="nutrition-content">
+                                <div class="welcome-message">
+                                    <i class="fas fa-utensils"></i>
+                                    <h4>Ready to Analyze Your Food</h4>
+                                    <p>Start the camera and capture your meal to get instant nutritional analysis powered by AI.</p>
+                                    <button class="btn-compact secondary" onclick="testOpenAIAPI()" style="margin-top: 1rem;">
+                                        <i class="fas fa-flask"></i> Test API Connection
+                                    </button>
+                                    <button class="btn-compact primary" onclick="testNutritionDisplay()" style="margin-top: 0.5rem;">
+                                        <i class="fas fa-chart-bar"></i> Test Nutrition Display
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="food-history">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Today's Food Intake</h3>
+                        <div class="daily-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="daily-calories">0</span>
+                                <span class="stat-label">Calories</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="daily-sugar">0g</span>
+                                <span class="stat-label">Sugar</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="daily-meals">0</span>
+                                <span class="stat-label">Meals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="food-history-list" class="history-list"></div>
+                </div>
+            </div>
+
+            <!-- Weekly Report Section -->
+            <div id="weekly-report" class="section">
+                <h2>Weekly Health Report</h2>
+                <div class="report-controls">
+                    <button class="generate-report-btn" onclick="generateWeeklyReport()">
+                        <i class="fas fa-file-pdf"></i>
+                        Generate Weekly Report
+                    </button>
+                </div>
+                <div id="weekly-stats" class="weekly-stats">
+                    <div class="week-summary">
+                        <h3>This Week's Summary</h3>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="label">Total Calories:</span>
+                                <span class="value" id="total-calories">1,850</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Sugar Intake:</span>
+                                <span class="value" id="sugar-intake">45g</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Meals Tracked:</span>
+                                <span class="value" id="meals-tracked">21</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Health Score:</span>
+                                <span class="value" id="health-score">8.5/10</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
